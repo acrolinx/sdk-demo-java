@@ -1,4 +1,4 @@
-# Acrolinx Java SDK Demo
+# Acrolinx Java SDK Demo [![Build Status](https://travis-ci.org/acrolinx/sdk-demo-java.svg?branch=master)](https://travis-ci.org/acrolinx/sdk-demo-java)
 
 A little demo of the [Acrolinx Java SDK](https://github.com/acrolinx/sdk-java).
 
