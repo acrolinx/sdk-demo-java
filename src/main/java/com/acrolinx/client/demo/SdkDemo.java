@@ -19,10 +19,7 @@ package com.acrolinx.client.demo;
 import com.acrolinx.client.sdk.AccessToken;
 import com.acrolinx.client.sdk.AcrolinxEndpoint;
 import com.acrolinx.client.sdk.SignInSuccess;
-import com.acrolinx.client.sdk.check.CheckOptions;
-import com.acrolinx.client.sdk.check.CheckRequest;
-import com.acrolinx.client.sdk.check.CheckResult;
-import com.acrolinx.client.sdk.check.ReportType;
+import com.acrolinx.client.sdk.check.*;
 import com.acrolinx.client.sdk.exceptions.AcrolinxException;
 import com.acrolinx.client.sdk.platform.Capabilities;
 import com.acrolinx.client.sdk.platform.GuidanceProfile;
@@ -40,13 +37,13 @@ public class SdkDemo {
      * You'll get the signature for your integration after a successful certification meeting.
      * See: https://docs.acrolinx.com/customintegrations
      */
-    private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
+    private static final String SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
 
     private static final String CLIENT_VERSION = "1.2.3.666";
     private static final String CLIENT_LOCALE = "en";
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException, AcrolinxException {
-        AcrolinxEndpoint acrolinxEndpoint = new AcrolinxEndpoint(new URI(ACROLINX_URL), CLIENT_SIGNATURE,
+        AcrolinxEndpoint acrolinxEndpoint = new AcrolinxEndpoint(new URI(ACROLINX_URL), SIGNATURE,
                 CLIENT_VERSION, CLIENT_LOCALE);
 
         /**
@@ -67,7 +64,8 @@ public class SdkDemo {
          * In this example we choose the first english Guidance Profile.
          */
         Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
-        Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles().stream()
+        Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities()
+                .getGuidanceProfiles().stream()
                 .filter(it -> it.getLanguage().getId().startsWith("en"))
                 .findFirst();
 
@@ -76,8 +74,8 @@ public class SdkDemo {
         }
 
         /**
-         * If you want to check a document without a document reference, you should set the content format to
-         * make sure it will be processed correctly.
+         * If you want to check a document without a content reference {@link CheckRequestBuilder#withContentReference},
+         * you should set the content format to make sure it will be processed correctly.
          */
         CheckOptions checkOptions = CheckOptions.getBuilder()
                 .withContentFormat("TEXT")
