@@ -24,16 +24,22 @@ import com.acrolinx.client.sdk.check.CheckRequest;
 import com.acrolinx.client.sdk.check.CheckResult;
 import com.acrolinx.client.sdk.check.ReportType;
 import com.acrolinx.client.sdk.exceptions.AcrolinxException;
+import com.acrolinx.client.sdk.platform.Capabilities;
+import com.acrolinx.client.sdk.platform.GuidanceProfile;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.Optional;
 
 public class SdkDemo {
     private static final String ACROLINX_URL = "https://test-ssl.acrolinx.com";
 
-    // You'll get the clientSignature for your integration after a successful certification meeting.
-    // See: https://docs.acrolinx.com/customintegrations
+    /**
+     * The signature as configured in the Acrolinx license.
+     * You'll get the signature for your integration after a successful certification meeting.
+     * See: https://docs.acrolinx.com/customintegrations
+     */
     private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
 
     private static final String CLIENT_VERSION = "1.2.3.666";
@@ -43,19 +49,44 @@ public class SdkDemo {
         AcrolinxEndpoint acrolinxEndpoint = new AcrolinxEndpoint(new URI(ACROLINX_URL), CLIENT_SIGNATURE,
                 CLIENT_VERSION, CLIENT_LOCALE);
 
+        /**
+         * In order to use methods that requires an AccessToken, you need to get an AccessToken first.
+         * Alternatively to signInInteractive you might get an API Token in the Acrolinx Dashboard
+         * or use the {@link AcrolinxEndpoint#signInWithSSO}.
+         * See https://github.com/acrolinx/platform-api#authentication
+         */
         SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(signInUrl -> {
             System.out.println("Please sign-in at " + signInUrl);
         });
-
         AccessToken accessToken = signInSuccess.getAccessToken();
 
+
+        /**
+         * You need to configure a Guidance Profile to make sure that the document is checked in the correct language
+         * and with the correct settings.
+         * In this example we choose the first english guidance profile.
+         */
+        Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
+        Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles().stream()
+                .filter(it -> it.getLanguage().getId().startsWith("en"))
+                .findFirst();
+
+        if (!englishGuidanceProfile.isPresent()) {
+            throw new IllegalStateException("Can't find an english guidance profile.");
+        }
+
+        /**
+         * If you want to check a document without a document reference, you should set the content format to
+         * make sure it will be processed correctly.
+         */
         CheckOptions checkOptions = CheckOptions.getBuilder()
                 .withContentFormat("TEXT")
+                .withGuidanceProfileId(englishGuidanceProfile.get().getId())
                 .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
                 .build();
 
         CheckResult checkResult = acrolinxEndpoint.check(accessToken,
-                CheckRequest.ofDocumentContent("This textt has an errorr.").setCheckOptions(checkOptions).build(),
+                CheckRequest.ofDocumentContent("This textt has an errorr.").withCheckOptions(checkOptions).build(),
                 progress -> {
                     System.out.println("Progress: " + progress.getPercent() + "% (" + progress.getMessage() + ")");
                 }
