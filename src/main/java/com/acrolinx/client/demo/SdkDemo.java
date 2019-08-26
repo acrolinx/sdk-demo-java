@@ -50,13 +50,13 @@ public class SdkDemo {
                 CLIENT_VERSION, CLIENT_LOCALE);
 
         /**
-         * In order to use methods that requires an AccessToken, you need to get an AccessToken first.
+         * In order to use methods that require an access token, you need to get an access token first.
          * Alternatively to signInInteractive you might get an API Token in the Acrolinx Dashboard
-         * or use the {@link AcrolinxEndpoint#signInWithSSO}.
+         * or use {@link AcrolinxEndpoint#signInWithSSO}.
          * See https://github.com/acrolinx/platform-api#authentication
          */
         SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(signInUrl -> {
-            System.out.println("Please sign-in at " + signInUrl);
+            System.out.println("Please sign in at " + signInUrl);
         });
         AccessToken accessToken = signInSuccess.getAccessToken();
 
@@ -64,7 +64,7 @@ public class SdkDemo {
         /**
          * You need to configure a Guidance Profile to make sure that the document is checked in the correct language
          * and with the correct settings.
-         * In this example we choose the first english guidance profile.
+         * In this example we choose the first english Guidance Profile.
          */
         Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
         Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles().stream()
