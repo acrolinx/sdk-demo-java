@@ -50,7 +50,7 @@ public class SdkDemo {
                 .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
                 .build();
 
-        CheckResult checkResult = acrolinxEndpoint.checkAndGetResult(accessToken,
+        CheckResult checkResult = acrolinxEndpoint.check(accessToken,
                 CheckRequest.ofDocumentContent("This textt has an errorr.").setCheckOptions(checkOptions).build(),
                 progress -> {
                     System.out.println("Progress: " + progress.getPercent() + "% (" + progress.getMessage() + ")");
