@@ -31,7 +31,11 @@ import java.util.Collections;
 
 public class SdkDemo {
     private static final String ACROLINX_URL = "https://test-ssl.acrolinx.com";
+
+    // You'll get the clientSignature for your integration after a successful certification meeting.
+    // See: https://docs.acrolinx.com/customintegrations
     private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
+
     private static final String CLIENT_VERSION = "1.2.3.666";
     private static final String CLIENT_LOCALE = "en";
 
