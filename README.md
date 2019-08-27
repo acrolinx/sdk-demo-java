@@ -2,7 +2,7 @@
 
 A little demo of the [Acrolinx Java SDK](https://github.com/acrolinx/sdk-java).
 
-## Run it
+## Run It
 
 ```
 ./gradlew run
