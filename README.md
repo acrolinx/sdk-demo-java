@@ -23,9 +23,7 @@ Before you start developing your own integration, you might benefit from looking
 * the [Acrolinx SDKs](https://github.com/acrolinx?q=sdk), and
 * the [Acrolinx Demo Projects](https://github.com/acrolinx?q=demo).
 
-## Getting Started
-
-### Run the Samples
+## Run the Sample
 
 ```bash
 ./gradlew run
