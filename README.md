@@ -4,7 +4,7 @@ A little demo of the [Acrolinx Java SDK](https://github.com/acrolinx/sdk-java).
 
 ## Run It
 
-```
+```bash
 ./gradlew run
 ```
 
