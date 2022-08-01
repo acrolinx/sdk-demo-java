@@ -1,9 +1,0 @@
-sudo: false
-dist: trusty
-language: java
-jdk:
-  - oraclejdk11
-os:
-  - linux
-script:
-  - "./gradlew build --refresh-dependencies"
