@@ -30,12 +30,12 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class SdkDemo {
-    private static final String ACROLINX_URL = "https://test-ssl.acrolinx.com";
+    private static final String ACROLINX_URL = "https://partner-dev.internal.acrolinx.sh";
 
     /**
      * The signature as configured in the Acrolinx license. You'll get the signature
      * for your integration after a successful certification meeting. See:
-     * https://docs.acrolinx.com/customintegrations
+     * <a href="https://docs.acrolinx.com/customintegrations">...</a>
      */
     private static final String SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
 
@@ -53,9 +53,8 @@ public class SdkDemo {
          * {@link AcrolinxEndpoint#signInWithSSO}. See
          * https://github.com/acrolinx/platform-api#authentication
          */
-        SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(signInUrl -> {
-            System.out.println("Please sign in at " + signInUrl);
-        });
+        SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(signInUrl ->
+                System.out.println("Please sign in at " + signInUrl));
         // Alternatively use SSO to sign in.
         // See:
         // https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/configuration.md#authentication
@@ -72,7 +71,7 @@ public class SdkDemo {
         Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles()
                 .stream().filter(it -> it.getLanguage().getId().startsWith("en")).findFirst();
 
-        if (!englishGuidanceProfile.isPresent()) {
+        if (englishGuidanceProfile.isEmpty()) {
             throw new IllegalStateException("Can't find an english guidance profile.");
         }
 
@@ -87,9 +86,7 @@ public class SdkDemo {
 
         CheckResult checkResult = acrolinxEndpoint.check(accessToken,
                 CheckRequest.ofDocumentContent("This textt has an errorr.").withCheckOptions(checkOptions).build(),
-                progress -> {
-                    System.out.println("Progress: " + progress.getPercent() + "% (" + progress.getMessage() + ")");
-                });
+                progress -> System.out.println("Progress: " + progress.getPercent() + "% (" + progress.getMessage() + ")"));
 
         System.out.println("Score: " + checkResult.getQuality().getScore());
         System.out.println("Status: " + checkResult.getQuality().getStatus());
