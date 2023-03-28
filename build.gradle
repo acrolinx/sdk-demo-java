@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id "org.sonarqube" version "4.0.0.2929"
 }
 
 group 'com.acrolinx.client'
@@ -16,4 +17,12 @@ dependencies {
 
 application {
     mainClassName = 'com.acrolinx.client.demo.SdkDemo'
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "acrolinx_sdk-demo-java"
+    property "sonar.organization", "acrolinx"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
