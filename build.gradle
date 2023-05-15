@@ -4,16 +4,16 @@ plugins {
     id "org.sonarqube" version "4.0.0.2929"
 }
 
-group 'com.acrolinx.client'
-version '1.0.12'
+dependencies {
+    implementation 'com.acrolinx.client:sdk:1.0.+'
+}
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation 'com.acrolinx.client:sdk:1.0.+'
-}
+group 'com.acrolinx.client'
+version '1.0.12'
 
 application {
     mainClassName = 'com.acrolinx.client.demo.SdkDemo'
