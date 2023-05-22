@@ -53,9 +53,9 @@ public class SdkDemo
                 CLIENT_LOCALE);
 
         /*
-         * In order to use methods that require an access token, you need to get an access token
-         * first. Alternatively to signInInteractive you might get an API Token in the Acrolinx
-         * Dashboard or use {@link AcrolinxEndpoint#signInWithSSO}. See
+         * In order to use methods that require an access token, you need to get an access token first.
+         * Alternatively to signInInteractive you might get an API Token in the Acrolinx Dashboard or use
+         * {@link AcrolinxEndpoint#signInWithSSO}. See
          * https://github.com/acrolinx/platform-api#authentication
          */
         SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(
@@ -70,9 +70,9 @@ public class SdkDemo
         AccessToken accessToken = signInSuccess.getAccessToken();
 
         /*
-         * You need to configure a Guidance Profile to make sure that the document is checked in the
-         * correct language and with the correct settings. In this example we choose the first
-         * English Guidance Profile.
+         * You need to configure a Guidance Profile to make sure that the document is checked in the correct
+         * language and with the correct settings. In this example we choose the first English Guidance
+         * Profile.
          */
         Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
         Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles().stream().filter(
@@ -84,8 +84,8 @@ public class SdkDemo
 
         /*
          * If you want to check a document without a content reference {@link
-         * CheckRequestBuilder#withContentReference}, you should set the content format to make sure
-         * it will be processed correctly.
+         * CheckRequestBuilder#withContentReference}, you should set the content format to make sure it will
+         * be processed correctly.
          */
         CheckOptions checkOptions = CheckOptions.getBuilder().withContentFormat("TEXT").withGuidanceProfileId(
                 englishGuidanceProfile.get().getId()).withGenerateReportTypes(
