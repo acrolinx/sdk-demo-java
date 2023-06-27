@@ -78,7 +78,7 @@ public class SdkDemo
         Optional<GuidanceProfile> englishGuidanceProfile = capabilities.getCheckingCapabilities().getGuidanceProfiles().stream().filter(
                 guidanceProfile -> guidanceProfile.getLanguage().getId().startsWith("en")).findFirst();
 
-        if (englishGuidanceProfile.isEmpty()) {
+        if (!englishGuidanceProfile.isPresent()) {
             throw new IllegalStateException("Can't find an English guidance profile.");
         }
 
