@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 11
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: '11'
@@ -25,7 +25,6 @@ jobs:
       - name: Sonar Scan Project
         uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
         with:
           arguments: sonar
@@ -38,7 +37,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 8
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: '8'
