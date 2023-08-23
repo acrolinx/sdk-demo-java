@@ -59,7 +59,7 @@ public class SdkDemo
          * https://github.com/acrolinx/platform-api#authentication
          */
         SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(
-                signInUrl -> System.out.println("Please sign in at " + signInUrl));
+                urlString -> System.out.println("Please sign in at " + urlString));
 
         /*
          * Alternatively use SSO to sign in. See:
