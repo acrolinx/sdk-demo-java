@@ -23,6 +23,11 @@ application {
 	mainClassName = 'com.acrolinx.client.demo.SdkDemo'
 }
 
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
 sonar {
 	properties {
 		property "sonar.projectKey", "acrolinx_sdk-demo-java"
