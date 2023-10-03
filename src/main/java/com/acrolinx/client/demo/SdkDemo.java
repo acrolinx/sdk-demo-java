@@ -31,84 +31,92 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SdkDemo
-{
-    private static final String ACROLINX_URL = "https://partner-dev.internal.acrolinx.sh";
-    private static final String CLIENT_LOCALE = "en";
-    /**
-     * The client signature as configured in the Acrolinx license. You'll get the signature for your
-     * integration after a successful certification meeting.
-     * 
-     * @see <a href=
-     *      "https://support.acrolinx.com/hc/en-us/sections/10211640774162-Custom-Integrations">Custom
-     *      Integrations</a>
-     */
-    private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
-    private static final String CLIENT_VERSION = "1.2.3";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SdkDemo.class);
+public class SdkDemo {
+  private static final String ACROLINX_URL = "https://partner-dev.internal.acrolinx.sh";
+  private static final String CLIENT_LOCALE = "en";
+  /**
+   * The client signature as configured in the Acrolinx license. You'll get the signature for your
+   * integration after a successful certification meeting.
+   *
+   * @see <a href=
+   *     "https://support.acrolinx.com/hc/en-us/sections/10211640774162-Custom-Integrations">Custom
+   *     Integrations</a>
+   */
+  private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
 
-    public static void main(String[] args) throws URISyntaxException, InterruptedException, AcrolinxException
-    {
-        AcrolinxEndpoint acrolinxEndpoint = new AcrolinxEndpoint(new URI(ACROLINX_URL), CLIENT_SIGNATURE,
-                CLIENT_VERSION, CLIENT_LOCALE);
-        AccessToken accessToken = signInInteractive(acrolinxEndpoint);
-        GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
-        CheckOptions checkOptions = createCheckOptions(guidanceProfile);
+  private static final String CLIENT_VERSION = "1.2.3";
+  private static final Logger LOGGER = LoggerFactory.getLogger(SdkDemo.class);
 
-        CheckResult checkResult = acrolinxEndpoint.check(accessToken, createCheckRequest(checkOptions),
-                progress -> LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
+  public static void main(String[] args)
+      throws URISyntaxException, InterruptedException, AcrolinxException {
+    AcrolinxEndpoint acrolinxEndpoint =
+        new AcrolinxEndpoint(
+            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
+    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
+    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
+    CheckOptions checkOptions = createCheckOptions(guidanceProfile);
 
-        LOGGER.info("Score: {}", checkResult.getQuality().getScore());
-        LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
-        LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
-    }
+    CheckResult checkResult =
+        acrolinxEndpoint.check(
+            accessToken,
+            createCheckRequest(checkOptions),
+            progress ->
+                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
 
-    /**
-     * If you want to check a document without a content reference
-     * {@link CheckRequestBuilder#withContentReference}, you should set the content format to make sure
-     * it will be processed correctly.
-     */
-    private static CheckOptions createCheckOptions(GuidanceProfile guidanceProfile)
-    {
-        return CheckOptions.getBuilder().withContentFormat("TEXT").withGuidanceProfileId(
-                guidanceProfile.getId()).withGenerateReportTypes(
-                        Collections.singletonList(ReportType.scorecard)).build();
-    }
+    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
+    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
+    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
+  }
 
-    private static CheckRequest createCheckRequest(CheckOptions checkOptions)
-    {
-        return CheckRequest.ofDocumentContent("This textt has an errorr.").withCheckOptions(checkOptions).build();
-    }
+  /**
+   * If you want to check a document without a content reference {@link
+   * CheckRequestBuilder#withContentReference}, you should set the content format to make sure it
+   * will be processed correctly.
+   */
+  private static CheckOptions createCheckOptions(GuidanceProfile guidanceProfile) {
+    return CheckOptions.getBuilder()
+        .withContentFormat("TEXT")
+        .withGuidanceProfileId(guidanceProfile.getId())
+        .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
+        .build();
+  }
 
-    /**
-     * You need to configure a Guidance Profile to make sure that the document is checked in the correct
-     * language and with the correct settings. In this example we choose the first English Guidance
-     * Profile.
-     */
-    private static GuidanceProfile getGuidanceProfiles(AcrolinxEndpoint acrolinxEndpoint, AccessToken accessToken)
-            throws AcrolinxException
-    {
-        Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
-        return capabilities.getCheckingCapabilities().getGuidanceProfiles().stream().filter(
-                guidanceProfile -> guidanceProfile.getLanguage().getId().startsWith("en")).findFirst().orElseThrow(
-                        () -> new IllegalStateException("Can't find an English guidance profile."));
-    }
+  private static CheckRequest createCheckRequest(CheckOptions checkOptions) {
+    return CheckRequest.ofDocumentContent("This textt has an errorr.")
+        .withCheckOptions(checkOptions)
+        .build();
+  }
 
-    /**
-     * In order to use methods that require an access token, you need to get an access token first.
-     * Alternatively to signInInteractive you might get an API Token in the Acrolinx Dashboard or use
-     * {@link AcrolinxEndpoint#signInWithSSO}.
-     * 
-     * @see <a href="https://github.com/acrolinx/platform-api#authentication">Acrolinx Platform API</a>
-     * @see <a href=
-     *      "https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
-     *      and Setting the Acrolinx URL</a>
-     */
-    private static AccessToken signInInteractive(AcrolinxEndpoint acrolinxEndpoint)
-            throws AcrolinxException, InterruptedException
-    {
-        SignInSuccess signInSuccess = acrolinxEndpoint.signInInteractive(
-                urlString -> LOGGER.info("Please sign in at: {}", urlString));
-        return signInSuccess.getAccessToken();
-    }
+  /**
+   * You need to configure a Guidance Profile to make sure that the document is checked in the
+   * correct language and with the correct settings. In this example we choose the first English
+   * Guidance Profile.
+   */
+  private static GuidanceProfile getGuidanceProfiles(
+      AcrolinxEndpoint acrolinxEndpoint, AccessToken accessToken) throws AcrolinxException {
+    Capabilities capabilities = acrolinxEndpoint.getCapabilities(accessToken);
+    return capabilities.getCheckingCapabilities().getGuidanceProfiles().stream()
+        .filter(guidanceProfile -> guidanceProfile.getLanguage().getId().startsWith("en"))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Can't find an English guidance profile."));
+  }
+
+  /**
+   * In order to use methods that require an access token, you need to get an access token first.
+   * Alternatively to signInInteractive you might get an API Token in the Acrolinx Dashboard or use
+   * {@link AcrolinxEndpoint#signInWithSSO}.
+   *
+   * @see <a href="https://github.com/acrolinx/platform-api#authentication">Acrolinx Platform
+   *     API</a>
+   * @see <a href=
+   *     "https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
+   *     and Setting the Acrolinx URL</a>
+   */
+  private static AccessToken signInInteractive(AcrolinxEndpoint acrolinxEndpoint)
+      throws AcrolinxException, InterruptedException {
+    SignInSuccess signInSuccess =
+        acrolinxEndpoint.signInInteractive(
+            urlString -> LOGGER.info("Please sign in at: {}", urlString));
+    return signInSuccess.getAccessToken();
+  }
 }

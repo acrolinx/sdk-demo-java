@@ -50,7 +50,7 @@ spotless {
 	java {
 		importOrder()
 		removeUnusedImports()
-		eclipse().configFile rootProject.file('spotless.eclipseformat.xml')
+		googleJavaFormat()
 	}
 	format 'misc', {
 		target '*.gradle', '*.md', '.gitignore', '*.sh'
