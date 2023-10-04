@@ -19,14 +19,12 @@ repositories {
 group 'com.acrolinx.client'
 version '1.0.12'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 application {
-	mainClassName = 'com.acrolinx.client.demo.SdkDemo'
+	mainClass = 'com.acrolinx.client.demo.SdkDemo'
 }
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
 	withJavadocJar()
 	withSourcesJar()
 }
