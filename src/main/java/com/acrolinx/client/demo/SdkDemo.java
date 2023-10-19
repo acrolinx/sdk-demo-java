@@ -19,14 +19,18 @@ import com.acrolinx.client.sdk.AcrolinxEndpoint;
 import com.acrolinx.client.sdk.SignInSuccess;
 import com.acrolinx.client.sdk.check.CheckOptions;
 import com.acrolinx.client.sdk.check.CheckRequest;
+import com.acrolinx.client.sdk.check.CheckRequest.ContentEncoding;
 import com.acrolinx.client.sdk.check.CheckRequestBuilder;
 import com.acrolinx.client.sdk.check.CheckResult;
 import com.acrolinx.client.sdk.check.ReportType;
 import com.acrolinx.client.sdk.exceptions.AcrolinxException;
 import com.acrolinx.client.sdk.platform.Capabilities;
 import com.acrolinx.client.sdk.platform.GuidanceProfile;
+import com.google.common.io.Resources;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Base64;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,24 +52,13 @@ public class SdkDemo {
   private static final Logger LOGGER = LoggerFactory.getLogger(SdkDemo.class);
 
   public static void main(String[] args)
-      throws URISyntaxException, InterruptedException, AcrolinxException {
-    AcrolinxEndpoint acrolinxEndpoint =
-        new AcrolinxEndpoint(
-            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
-    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
-    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
-    CheckOptions checkOptions = createCheckOptions(guidanceProfile);
+      throws URISyntaxException, InterruptedException, AcrolinxException, IOException {
 
-    CheckResult checkResult =
-        acrolinxEndpoint.check(
-            accessToken,
-            createCheckRequest(checkOptions),
-            progress ->
-                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
-
-    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
-    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
-    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
+    if (args.length > 0 && args[0].equals("docx")) {
+      checkDocxFile();
+    } else {
+      checkSimpleText();
+    }
   }
 
   /**
@@ -73,16 +66,26 @@ public class SdkDemo {
    * CheckRequestBuilder#withContentReference}, you should set the content format to make sure it
    * will be processed correctly.
    */
-  private static CheckOptions createCheckOptions(GuidanceProfile guidanceProfile) {
+  private static CheckOptions createCheckOptions(GuidanceProfile guidanceProfile, String format) {
     return CheckOptions.getBuilder()
-        .withContentFormat("TEXT")
+        .withContentFormat(format)
         .withGuidanceProfileId(guidanceProfile.getId())
         .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
         .build();
   }
 
-  private static CheckRequest createCheckRequest(CheckOptions checkOptions) {
+  private static CheckRequest createTxtCheckRequest(CheckOptions checkOptions) {
     return CheckRequest.ofDocumentContent("This textt has an errorr.")
+        .withCheckOptions(checkOptions)
+        .build();
+  }
+
+  private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions) throws IOException {
+    String wordDocumentName = "document.docx";
+    byte[] content = Resources.toByteArray(Resources.getResource(wordDocumentName));
+    return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(content))
+        .withContentEncoding(ContentEncoding.base64)
+        .withContentReference(wordDocumentName)
         .withCheckOptions(checkOptions)
         .build();
   }
@@ -118,5 +121,51 @@ public class SdkDemo {
         acrolinxEndpoint.signInInteractive(
             urlString -> LOGGER.info("Please sign in at: {}", urlString));
     return signInSuccess.getAccessToken();
+  }
+
+  private static void checkSimpleText()
+      throws AcrolinxException, InterruptedException, URISyntaxException {
+    AcrolinxEndpoint acrolinxEndpoint =
+        new AcrolinxEndpoint(
+            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
+
+    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
+
+    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
+    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "TEXT");
+
+    CheckResult checkResult =
+        acrolinxEndpoint.check(
+            accessToken,
+            createTxtCheckRequest(checkOptions),
+            progress ->
+                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
+
+    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
+    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
+    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
+  }
+
+  private static void checkDocxFile()
+      throws AcrolinxException, InterruptedException, URISyntaxException, IOException {
+
+    AcrolinxEndpoint acrolinxEndpoint =
+        new AcrolinxEndpoint(
+            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
+
+    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
+    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
+    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "AUTO");
+
+    CheckResult checkResult =
+        acrolinxEndpoint.check(
+            accessToken,
+            createDocxCheckRequest(checkOptions),
+            progress ->
+                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
+
+    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
+    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
+    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
   }
 }
