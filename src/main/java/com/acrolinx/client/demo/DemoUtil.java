@@ -26,16 +26,17 @@ import com.acrolinx.client.sdk.check.ReportType;
 import com.acrolinx.client.sdk.exceptions.AcrolinxException;
 import com.acrolinx.client.sdk.platform.Capabilities;
 import com.acrolinx.client.sdk.platform.GuidanceProfile;
-import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SdkDemo {
+class DemoUtil {
   private static final String ACROLINX_URL = "https://partner-dev.internal.acrolinx.sh";
   private static final String CLIENT_LOCALE = "en";
   /**
@@ -49,26 +50,17 @@ public class SdkDemo {
   private static final String CLIENT_SIGNATURE = "SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5";
 
   private static final String CLIENT_VERSION = "1.2.3";
-  private static final Logger LOGGER = LoggerFactory.getLogger(SdkDemo.class);
-
-  public static void main(String[] args)
-      throws URISyntaxException, InterruptedException, AcrolinxException, IOException {
-
-    if (args.length > 0 && args[0].equals("docx")) {
-      checkDocxFile();
-    } else {
-      checkSimpleText();
-    }
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(DemoUtil.class);
 
   /**
    * If you want to check a document without a content reference {@link
    * CheckRequestBuilder#withContentReference}, you should set the content format to make sure it
    * will be processed correctly.
    */
-  private static CheckOptions createCheckOptions(GuidanceProfile guidanceProfile, String format) {
+  private static CheckOptions createCheckOptions(
+      GuidanceProfile guidanceProfile, String contentFormat) {
     return CheckOptions.getBuilder()
-        .withContentFormat(format)
+        .withContentFormat(contentFormat)
         .withGuidanceProfileId(guidanceProfile.getId())
         .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
         .build();
@@ -80,9 +72,11 @@ public class SdkDemo {
         .build();
   }
 
-  private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions) throws IOException {
+  private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions)
+      throws IOException, URISyntaxException {
     String wordDocumentName = "document.docx";
-    byte[] content = Resources.toByteArray(Resources.getResource(wordDocumentName));
+    byte[] content =
+        Files.readAllBytes(Paths.get(DemoUtil.class.getResource(wordDocumentName).toURI()));
     return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(content))
         .withContentEncoding(ContentEncoding.base64)
         .withContentReference(wordDocumentName)
@@ -112,7 +106,7 @@ public class SdkDemo {
    * @see <a href="https://github.com/acrolinx/platform-api#authentication">Acrolinx Platform
    *     API</a>
    * @see <a href=
-   *     "https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
+   *     <p>"https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
    *     and Setting the Acrolinx URL</a>
    */
   private static AccessToken signInInteractive(AcrolinxEndpoint acrolinxEndpoint)
@@ -123,8 +117,7 @@ public class SdkDemo {
     return signInSuccess.getAccessToken();
   }
 
-  private static void checkSimpleText()
-      throws AcrolinxException, InterruptedException, URISyntaxException {
+  static void checkSimpleText() throws AcrolinxException, InterruptedException, URISyntaxException {
     AcrolinxEndpoint acrolinxEndpoint =
         new AcrolinxEndpoint(
             new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
@@ -146,7 +139,7 @@ public class SdkDemo {
     LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
   }
 
-  private static void checkDocxFile()
+  static void checkDocxFile()
       throws AcrolinxException, InterruptedException, URISyntaxException, IOException {
 
     AcrolinxEndpoint acrolinxEndpoint =
