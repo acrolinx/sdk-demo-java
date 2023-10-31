@@ -106,7 +106,7 @@ class DemoUtil {
    * @see <a href="https://github.com/acrolinx/platform-api#authentication">Acrolinx Platform
    *     API</a>
    * @see <a href=
-   *     <p>"https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
+   *     "https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/configuration.md#authentication">Authentication
    *     and Setting the Acrolinx URL</a>
    */
   private static AccessToken signInInteractive(AcrolinxEndpoint acrolinxEndpoint)
