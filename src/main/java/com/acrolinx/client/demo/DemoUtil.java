@@ -74,7 +74,7 @@ class DemoUtil {
 
   private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions)
       throws IOException, URISyntaxException {
-    String wordDocumentName = "document.docx";
+    String wordDocumentName = "/document.docx";
     byte[] content =
         Files.readAllBytes(Paths.get(DemoUtil.class.getResource(wordDocumentName).toURI()));
     return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(content))
