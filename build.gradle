@@ -1,6 +1,5 @@
 plugins {
 	id 'java'
-	id 'application'
 	id 'jacoco'
 	id 'org.sonarqube' version '4.0.0.2929'
 	id 'com.diffplug.spotless' version '6.13.0'
@@ -18,10 +17,6 @@ repositories {
 
 group 'com.acrolinx.client'
 version '1.0.12'
-
-application {
-	mainClass = 'com.acrolinx.client.demo.SdkDemo'
-}
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_1_8
@@ -57,4 +52,14 @@ spotless {
 		trimTrailingWhitespace()
 		endWithNewline()
 	}
+}
+
+task(SimpleStringCheckDemo, dependsOn: 'classes', type: JavaExec) {
+	mainClass = 'com.acrolinx.client.demo.SimpleStringCheckDemo'
+	classpath = sourceSets.main.runtimeClasspath
+}
+
+task(DocxCheckDemo, dependsOn: 'classes', type: JavaExec) {
+	mainClass = 'com.acrolinx.client.demo.DocxCheckDemo'
+	classpath = sourceSets.main.runtimeClasspath
 }

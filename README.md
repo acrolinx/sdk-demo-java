@@ -26,7 +26,9 @@ Before you start developing your own integration, you might benefit from looking
 ## Run the Sample
 
 ```bash
-./gradlew run
+./gradlew SimpleStringCheckDemo
+or
+./gradlew DocxCheckDemo
 ```
 
 ## License
