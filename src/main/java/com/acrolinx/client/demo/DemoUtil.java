@@ -36,9 +36,10 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class DemoUtil {
+final class DemoUtil {
   private static final String ACROLINX_URL = "https://partner-dev.internal.acrolinx.sh";
   private static final String CLIENT_LOCALE = "en";
+
   /**
    * The client signature as configured in the Acrolinx license. You'll get the signature for your
    * integration after a successful certification meeting.
@@ -51,6 +52,49 @@ class DemoUtil {
 
   private static final String CLIENT_VERSION = "1.2.3";
   private static final Logger LOGGER = LoggerFactory.getLogger(DemoUtil.class);
+
+  static void checkDocxFile()
+      throws AcrolinxException, InterruptedException, URISyntaxException, IOException {
+    AcrolinxEndpoint acrolinxEndpoint =
+        new AcrolinxEndpoint(
+            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
+
+    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
+    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
+    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "AUTO");
+    CheckRequest checkRequest = createDocxCheckRequest(checkOptions);
+
+    checkAndLogResult(acrolinxEndpoint, accessToken, checkRequest);
+  }
+
+  static void checkSimpleText() throws AcrolinxException, InterruptedException, URISyntaxException {
+    AcrolinxEndpoint acrolinxEndpoint =
+        new AcrolinxEndpoint(
+            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
+
+    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
+
+    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
+    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "TEXT");
+    CheckRequest checkRequest = createTxtCheckRequest(checkOptions);
+
+    checkAndLogResult(acrolinxEndpoint, accessToken, checkRequest);
+  }
+
+  private static void checkAndLogResult(
+      AcrolinxEndpoint acrolinxEndpoint, AccessToken accessToken, CheckRequest checkRequest)
+      throws AcrolinxException {
+    CheckResult checkResult =
+        acrolinxEndpoint.check(
+            accessToken,
+            checkRequest,
+            progress ->
+                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
+
+    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
+    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
+    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
+  }
 
   /**
    * If you want to check a document without a content reference {@link
@@ -66,20 +110,20 @@ class DemoUtil {
         .build();
   }
 
-  private static CheckRequest createTxtCheckRequest(CheckOptions checkOptions) {
-    return CheckRequest.ofDocumentContent("This textt has an errorr.")
+  private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions)
+      throws IOException, URISyntaxException {
+    String wordDocumentName = "/document.docx";
+    byte[] fileContents =
+        Files.readAllBytes(Paths.get(DemoUtil.class.getResource(wordDocumentName).toURI()));
+    return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(fileContents))
+        .withContentEncoding(ContentEncoding.base64)
+        .withContentReference(wordDocumentName)
         .withCheckOptions(checkOptions)
         .build();
   }
 
-  private static CheckRequest createDocxCheckRequest(CheckOptions checkOptions)
-      throws IOException, URISyntaxException {
-    String wordDocumentName = "/document.docx";
-    byte[] content =
-        Files.readAllBytes(Paths.get(DemoUtil.class.getResource(wordDocumentName).toURI()));
-    return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(content))
-        .withContentEncoding(ContentEncoding.base64)
-        .withContentReference(wordDocumentName)
+  private static CheckRequest createTxtCheckRequest(CheckOptions checkOptions) {
+    return CheckRequest.ofDocumentContent("This textt has an errorr.")
         .withCheckOptions(checkOptions)
         .build();
   }
@@ -117,48 +161,7 @@ class DemoUtil {
     return signInSuccess.getAccessToken();
   }
 
-  static void checkSimpleText() throws AcrolinxException, InterruptedException, URISyntaxException {
-    AcrolinxEndpoint acrolinxEndpoint =
-        new AcrolinxEndpoint(
-            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
-
-    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
-
-    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
-    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "TEXT");
-
-    CheckResult checkResult =
-        acrolinxEndpoint.check(
-            accessToken,
-            createTxtCheckRequest(checkOptions),
-            progress ->
-                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
-
-    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
-    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
-    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
-  }
-
-  static void checkDocxFile()
-      throws AcrolinxException, InterruptedException, URISyntaxException, IOException {
-
-    AcrolinxEndpoint acrolinxEndpoint =
-        new AcrolinxEndpoint(
-            new URI(ACROLINX_URL), CLIENT_SIGNATURE, CLIENT_VERSION, CLIENT_LOCALE);
-
-    AccessToken accessToken = signInInteractive(acrolinxEndpoint);
-    GuidanceProfile guidanceProfile = getGuidanceProfiles(acrolinxEndpoint, accessToken);
-    CheckOptions checkOptions = createCheckOptions(guidanceProfile, "AUTO");
-
-    CheckResult checkResult =
-        acrolinxEndpoint.check(
-            accessToken,
-            createDocxCheckRequest(checkOptions),
-            progress ->
-                LOGGER.info("Progress: {}% ({})", progress.getPercent(), progress.getMessage()));
-
-    LOGGER.info("Score: {}", checkResult.getQuality().getScore());
-    LOGGER.info("Status: {}", checkResult.getQuality().getStatus());
-    LOGGER.info("Scorecard: {}", checkResult.getReport(ReportType.scorecard).getLink());
+  private DemoUtil() {
+    throw new IllegalStateException();
   }
 }
