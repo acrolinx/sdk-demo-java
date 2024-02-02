@@ -56,12 +56,14 @@ spotless {
     }
 }
 
-task(SimpleStringCheckDemo, dependsOn: 'classes', type: JavaExec) {
+tasks.register('SimpleStringCheckDemo', JavaExec) {
+    dependsOn 'classes'
     mainClass = 'com.acrolinx.client.demo.SimpleStringCheckDemo'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task(DocxCheckDemo, dependsOn: 'classes', type: JavaExec) {
+tasks.register('DocxCheckDemo', JavaExec) {
+    dependsOn 'classes'
     mainClass = 'com.acrolinx.client.demo.DocxCheckDemo'
     classpath = sourceSets.main.runtimeClasspath
 }
