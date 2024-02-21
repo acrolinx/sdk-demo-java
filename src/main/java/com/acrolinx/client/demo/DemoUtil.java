@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Collections;
 import org.slf4j.Logger;
@@ -101,7 +101,7 @@ final class DemoUtil {
       throws IOException, URISyntaxException {
     String wordDocumentName = "/document.docx";
     byte[] fileContents =
-        Files.readAllBytes(Paths.get(DemoUtil.class.getResource(wordDocumentName).toURI()));
+        Files.readAllBytes(Path.of(DemoUtil.class.getResource(wordDocumentName).toURI()));
     return CheckRequest.ofDocumentContent(Base64.getEncoder().encodeToString(fileContents))
         .withContentEncoding(ContentEncoding.base64)
         .withContentReference(wordDocumentName)
