@@ -5,6 +5,10 @@ plugins {
     id 'com.diffplug.spotless' version '6.25.0'
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation 'com.acrolinx.client:sdk:1.0.22'
     implementation 'org.slf4j:slf4j-api:2.0.12'
@@ -12,12 +16,23 @@ dependencies {
     runtimeOnly 'ch.qos.logback:logback-classic:1.5.3'
 }
 
-repositories {
-    mavenCentral()
-}
-
 group = 'com.acrolinx.client'
 version = '0.1.0-SNAPSHOT'
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+compileTestJava {
+    options.encoding = "UTF-8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+    }
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -27,16 +42,9 @@ java {
 
 sonar {
     properties {
-        property "sonar.projectKey", "acrolinx_sdk-demo-java"
         property "sonar.organization", "acrolinx"
+        property "sonar.projectKey", "acrolinx_sdk-demo-java"
         property "sonar.host.url", "https://sonarcloud.io"
-    }
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
     }
 }
 
@@ -56,14 +64,14 @@ spotless {
     }
 }
 
-tasks.register('SimpleStringCheckDemo', JavaExec) {
-    dependsOn 'classes'
-    mainClass = 'com.acrolinx.client.demo.SimpleStringCheckDemo'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
 tasks.register('DocxCheckDemo', JavaExec) {
     dependsOn 'classes'
     mainClass = 'com.acrolinx.client.demo.DocxCheckDemo'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.register('SimpleStringCheckDemo', JavaExec) {
+    dependsOn 'classes'
+    mainClass = 'com.acrolinx.client.demo.SimpleStringCheckDemo'
     classpath = sourceSets.main.runtimeClasspath
 }
