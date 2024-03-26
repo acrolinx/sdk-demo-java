@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
-import java.util.Collections;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +93,7 @@ final class DemoUtil {
     return CheckOptions.getBuilder()
         .withContentFormat(contentFormat)
         .withGuidanceProfileId(guidanceProfile.getId())
-        .withGenerateReportTypes(Collections.singletonList(ReportType.scorecard))
+        .withGenerateReportTypes(List.of(ReportType.scorecard))
         .build();
   }
 
