@@ -8,11 +8,8 @@ For integrating the Sidebar see: [Acrolinx Java Sidebar Demo](https://github.com
 
 Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/main/topics/sdk-support.md)
 for consulting and getting your integration certified.
-The tests in this SDK work with a test license on an internal Acrolinx URL.
-This license is only meant for demonstration and developing purposes.
-Once you finished your integration, you'll have to get a license for your integration from Acrolinx.
 
-Acrolinx offers different other SDKs, and examples for developing integrations.
+This sample works with a test license on an internal Acrolinx URL. This license is only meant for demonstration and developing purposes. Once you finished your integration, you'll have to get a license for your integration from Acrolinx.
 
 Before you start developing your own integration, you might benefit from looking into:
 
@@ -23,26 +20,32 @@ Before you start developing your own integration, you might benefit from looking
 * the [Acrolinx SDKs](https://github.com/acrolinx?q=sdk), and
 * the [Acrolinx Demo Projects](https://github.com/acrolinx?q=demo).
 
-## Run the Sample
+## Getting Started
+
+### Build the Project
+
+1. You need Java 11 to build this project.
+2. This project uses [Gradle](https://gradle.org/).
+To build this project with the [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html#sec:using_wrapper), execute the following command:
+
+```bash
+./gradlew build
+```
+
+on an UNIX system, or
+
+```batch
+gradlew build
+```
+
+on a Windows computer.
+
+## Run the Samples
 
 ```bash
 ./gradlew SimpleStringCheckDemo
-or
-./gradlew DocxCheckDemo
 ```
 
-## License
-
-Copyright 2019-present Acrolinx GmbH
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at:
-
-[https://www.apache.org/licenses/LICENSE-2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+```
+./gradlew DocxCheckDemo
+```
